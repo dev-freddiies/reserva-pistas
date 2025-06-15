@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reserva de Pistas</title>
+</head>
+<body>
+  <h2>Reservar una pista</h2>
+
+  <form id="reservaForm">
+    <label for="pista">Selecciona una pista:</label>
+    <select id="pista" name="pistaId" required>
+      <!-- Las opciones se cargarán desde el backend -->
+    </select>
+    <br><br>
+    <button type="submit">Reservar</button>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+    // Cargar pistas desde el backend
+    window.onload = async () => {
+      const response = await fetch("/pistas");
+      const pistas = await response.json();
+      const select = document.getElementById("pista");
+
+      pistas.forEach(p => {
+        const option = document.createElement("option");
+        option.value = p.id;
+        option.textContent = p.nombre;
+        select.appendChild(option);
+      });
+    };
+
+    // Enviar reserva
+    document.getElementById("reservaForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const pistaId = document.getElementById("pista").value;
+
+      const response = await fetch("/reservar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pistaId }),
+      });
+
+      const data = await response.json();
+      document.getElementById("resultado").textContent = data.message || data.error;
+    });
+  </script>
+</body>
+</html>
